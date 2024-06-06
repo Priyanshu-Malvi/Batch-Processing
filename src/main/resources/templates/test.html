@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Table Columns</title>
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dynamic Table Columns</h1>
+    <div>
+        <label><input type="checkbox" class="column-toggle" data-column="1" checked> Column 1</label>
+        <label><input type="checkbox" class="column-toggle" data-column="2" checked> Column 2</label>
+        <label><input type="checkbox" class="column-toggle" data-column="3" checked> Column 3</label>
+        <label><input type="checkbox" class="column-toggle" data-column="4" checked> Column 4</label>
+    </div>
+    <table border="1">
+        <thead>
+            <tr>
+                <th class="col-1">Header 1</th>
+                <th class="col-2">Header 2</th>
+                <th class="col-3">Header 3</th>
+                <th class="col-4">Header 4</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="col-1">Row 1, Col 1</td>
+                <td class="col-2">Row 1, Col 2</td>
+                <td class="col-3">Row 1, Col 3</td>
+                <td class="col-4">Row 1, Col 4</td>
+            </tr>
+            <tr>
+                <td class="col-1">Row 2, Col 1</td>
+                <td class="col-2">Row 2, Col 2</td>
+                <td class="col-3">Row 2, Col 3</td>
+                <td class="col-4">Row 2, Col 4</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkboxes = document.querySelectorAll('.column-toggle');
+
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const columnClass = 'col-' + this.getAttribute('data-column');
+                    const cells = document.querySelectorAll('.' + columnClass);
+
+                    if (this.checked) {
+                        cells.forEach(cell => cell.classList.remove('hidden'));
+                    } else {
+                        cells.forEach(cell => cell.classList.add('hidden'));
+                    }
+                });
+
+                // Trigger change event on page load to set initial visibility
+                checkbox.dispatchEvent(new Event('change'));
+            });
+        });
+    </script>
+</body>
+</html>

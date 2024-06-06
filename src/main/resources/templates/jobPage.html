@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Start Job</title>
+</head>
+<body>
+    <h1>Start Batch Job</h1>
+    <form method="post" action="/job-process" enctype="multipart/form-data">
+    	<input type="file" name="file" accept=".csv" required />
+        <button type="submit">Start Job</button>
+    </form>
+    <form method="post" action="/terminate">
+        <button type="submit">Terminate Job</button>
+    </form>
+    <br>
+    <p th:text="${message}"></p>
+    <br>
+    <a th:href="@{'/allEmp'}">Show Employee</a>
+    <a th:href="@{'/batchInfo'}">Show Batch Process</a>
+</body>
+</html>

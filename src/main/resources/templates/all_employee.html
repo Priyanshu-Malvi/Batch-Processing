@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Start Job</title>
+</head>
+<body>
+	<a th:href="@{'/job'}">Add File</a>
+	<br>
+	<br>
+    <table class="table">
+				  <thead>
+				    <tr>
+				      <th scope="col">#ID</th>
+				      <th scope="col">Employee ID</th>
+				      <th scope="col">Full Name</th>
+				      <th scope="col">Company</th>
+				      <th scope="col">Number</th>
+				    </tr>
+				  </thead>
+				  <tbody>
+					
+				    <tr th:each="emp : ${employee}">
+				      <td th:text="${emp.id}"></td>
+				      <td th:text="${emp.employeeId}"></td>
+				      <td th:text="${emp.fullname}"></td>
+				      <td th:text="${emp.number}"></td>
+				      <td th:text="${emp.company}"></td>
+				    </tr>
+								
+				  </tbody>
+				</table>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Start Job</title>
+
+<style type="text/css">
+table, th, td {
+	border: 1px solid black;
+}
+#stepTable{
+	display: none;
+}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+	<a th:href="@{'/job'}">Add File</a>
+	<br>
+	<br>
+	<h2>Job Table</h2>
+	<table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#Job ID</th>
+                <th scope="col">Create Time</th>
+                <th scope="col">Start Time</th>
+                <th scope="col">End Time</th>
+                <th scope="col">Last Updated Time</th>
+                <th scope="col">File</th>
+                <th scope="col">Batch Status</th>
+                <th scope="col">Exit Status</th>
+            </tr>
+        </thead>
+        <tbody id="jobTableBody">
+            <tr th:each="job : ${alljob}">
+                <td class="jobId" th:text="${job.jobId}"></td>
+                <td th:text="${job.jobCreateTime}"></td>
+                <td th:text="${job.jobStartTime}"></td>
+                <td th:text="${job.jobEndTime}"></td>
+                <td th:text="${job.jobLastUpdatedTime}"></td>
+                <td th:text="${job.jobParams}"></td>
+                <td class="jobBatchStatus" th:text="${job.jobBatchStatus}"></td>
+                <td class="jobExitStatus" th:text="${job.jobExitStatus}"></td>
+            </tr>
+        </tbody>
+    </table>
+	<form method="post" action="/terminate">
+        <button type="submit">Terminate Job</button>
+    </form>
+    <br><br>
+
+    <h2>Step Table</h2>
+    <table class="table" id="stepTable">
+        <thead>
+            <tr>
+                <th scope="col">#Step ID</th>
+                <th scope="col">#Job Execution ID</th>
+                <th scope="col">Step Name</th>
+                <th scope="col">Create Time</th>
+                <th scope="col">Start Time</th>
+                <th scope="col">Last Updated Time</th>
+                <th scope="col">Status</th>
+                <th scope="col">Exception</th>
+            </tr>
+        </thead>
+        <tbody id="stepTableBody">
+            <tr th:each="step : ${allstep}">
+                <td th:text="${step.stepId}"></td>
+                <td th:text="${step.jobExecutionId}"></td>
+                <td th:text="${step.stepName}"></td>
+                <td th:text="${step.stepCreateTime}"></td>
+                <td th:text="${step.stepStartTime}"></td>
+                <td th:text="${step.stepLastUpdatedTime}"></td>
+                <td class="stepStatus" th:text="${step.stepStatus}"></td>
+                <td th:text="${step.exception}"></td>
+            </tr>
+        </tbody>
+    </table>
+	
+	<script type="text/javascript">
+        function fetchAndUpdateData() {
+            $.ajax({
+                url: '/jobs',
+                method: 'GET',
+                success: function(jobs) {
+                    $("#jobTableBody").empty();
+                    $.each(jobs, function(index, job) {
+                        $("#jobTableBody").append(
+                            "<tr>" +
+                                "<td class='jobId'>" + job.jobId + "</td>" +
+                                "<td>" + job.jobCreateTime + "</td>" +
+                                "<td>" + job.jobStartTime + "</td>" +
+                                "<td>" + job.jobEndTime + "</td>" +
+                                "<td>" + job.jobLastUpdatedTime + "</td>" +
+                                "<td>" + job.jobParams + "</td>" +
+                                "<td class='jobBatchStatus'>" + job.jobBatchStatus + "</td>" +
+                                "<td class='jobExitStatus'>" + job.jobExitStatus + "</td>" +
+                            "</tr>"
+                        );
+                    });
+                    
+                    $(".jobId").click(function() {
+                   	 document.querySelector("#stepTable").style.display = "block";
+                        var jobId = $(this).text();
+                   	 console.log(jobId)
+                        fetchAndDisplaySteps(jobId);
+                    });
+                    
+                }
+            });
+            
+        }
+        
+        function fetchAndDisplaySteps(jobId) {
+            $.ajax({
+                url: '/steps/' + jobId,
+                method: 'GET',
+                success: function(steps) {
+                    $("#stepTableBody").empty();
+                    $.each(steps, function(index, step) {
+                        $("#stepTableBody").append(
+                            "<tr>" +
+                                "<td>" + step.stepId + "</td>" +
+                                "<td>" + step.jobExecutionId + "</td>" +
+                                "<td>" + step.stepName + "</td>" +
+                                "<td>" + step.stepCreateTime + "</td>" +
+                                "<td>" + step.stepStartTime + "</td>" +
+                                "<td>" + step.stepLastUpdatedTime + "</td>" +
+                                "<td class='stepStatus'>" + step.stepStatus + "</td>" +
+                                "<td>" + step.exception + "</td>" +
+                            "</tr>"
+                        );
+                    });
+                }
+            });
+        }
+
+/*             $.ajax({
+                url: '/steps',
+                method: 'GET',
+                success: function(steps) {
+                    $("#stepTableBody").empty();
+                    $.each(steps, function(index, step) {
+                        $("#stepTableBody").append(
+                            "<tr>" +
+                                "<td>" + step.stepId + "</td>" +
+                                "<td>" + step.jobExecutionId + "</td>" +
+                                "<td>" + step.stepName + "</td>" +
+                                "<td>" + step.stepCreateTime + "</td>" +
+                                "<td>" + step.stepStartTime + "</td>" +
+                                "<td>" + step.stepLastUpdatedTime + "</td>" +
+                                "<td class='stepStatus'>" + step.stepStatus + "</td>" +
+                                "<td>" + step.job.jobId + "</td>" +
+                            "</tr>"
+                        );
+                    });
+                }
+            });
+         */
+
+        $(document).ready(function() {
+            // Fetch and update data every 1 seconds
+            console.log("function called")
+            setInterval(fetchAndUpdateData, 10000);
+        });
+         
+         $(".jobId").click(function() {
+        	 document.querySelector("#stepTable").style.display = "block";
+             var jobId = $(this).text();
+        	 console.log(jobId)
+             fetchAndDisplaySteps(jobId);
+         });
+         
+    </script>
+</body>
+</html>
