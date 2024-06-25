@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import com.demo.model.JobModel;
 import com.demo.repository.JobInfoRepository;
 
+import jakarta.servlet.http.HttpSession;
 
 @Component
 public class JobCompletionListener implements JobExecutionListener{

@@ -1,7 +1,9 @@
 package com.demo.controller;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
@@ -18,7 +20,11 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.ui.Model;
@@ -31,13 +37,18 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.demo.config.StepCompletionListener;
+import com.demo.model.DuplicateEmployeeModel;
 import com.demo.model.EmployeeModel;
 import com.demo.model.JobModel;
 import com.demo.model.StepMaster;
+import com.demo.repository.DuplicateEmpRepository;
 import com.demo.repository.EmployeeRepository;
 import com.demo.repository.JobInfoRepository;
 import com.demo.repository.StepMasterRepo;
+import com.demo.service.ExcelExportService;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 @EnableAsync
 @RestController
@@ -64,6 +75,18 @@ public class JobController {
 	
 	@Autowired 
 	private StepMasterRepo stepRepo;
+	
+	@Autowired
+	private DuplicateEmpRepository duplicateEmpRepo;
+	
+//	@Autowired
+//	private DuplicateEmployeeService service;
+	
+	@Autowired
+	private StepCompletionListener stepListner;
+	
+	@Autowired
+	private ExcelExportService excelExportService;
 	
 	private final BlockingQueue<JobParameters> jobQueue = new LinkedBlockingQueue<>();
 	private final AtomicBoolean jobRunning = new AtomicBoolean(false);
@@ -132,6 +155,40 @@ public class JobController {
 		}
 	}
 	
+	// Show duplicate employees
+	@GetMapping("/duplicate")
+	public ModelAndView duplicateEmployee() {
+		ModelAndView modelAndView = new ModelAndView("duplicates");
+		
+		Long jobId = stepListner.getJobId();
+		JobModel currJob = jobRepo.findById(jobId).get();
+				
+		List<DuplicateEmployeeModel> duplicates = duplicateEmpRepo.findByJob(currJob);
+		modelAndView.addObject("duplicates", duplicates);
+		
+		return modelAndView;
+	}
+	
+	// Download Excel 
+	@GetMapping("/duplicates/excel")
+    public ResponseEntity<InputStreamResource> downloadDuplicatesExcel() {
+		
+		Long jobId = stepListner.getJobId();
+		JobModel currJob = jobRepo.findById(jobId).get();
+				
+		List<DuplicateEmployeeModel> duplicates = duplicateEmpRepo.findByJob(currJob);
+		
+        ByteArrayInputStream in = excelExportService.exportToExcel(duplicates);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=duplicates.xlsx");
+
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(new InputStreamResource(in));
+    }
 	 
 	 // process to terminate the job
 	@PostMapping("/terminate")

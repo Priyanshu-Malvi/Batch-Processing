@@ -86,9 +86,14 @@ public class SpringBatchConfig {
 	public Step step(JobRepository repository, PlatformTransactionManager manager,
 			EmployeeRepository employeeRepository) {
 		LOGGER.info("Configuring Step");
-		return new StepBuilder("step1", repository).<EmployeeDtoClass, EmployeeModel>chunk(500, manager)
-				.reader(reader(null)).processor(compositeProcessor()).writer(employeeWritrer(employeeRepository))
-				.faultTolerant().skip(EmployeeWriteException.class).listener(stepCompletionListener).build();
+		return new StepBuilder("step1", repository)
+				.<EmployeeDtoClass, EmployeeModel>chunk(500, manager)
+				.reader(reader(null))
+				.processor(compositeProcessor())
+				.writer(employeeWritrer(employeeRepository))
+				.faultTolerant().skip(EmployeeWriteException.class)
+				.listener(stepCompletionListener)
+				.build();
 	}
 
 	@Bean

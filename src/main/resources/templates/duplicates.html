@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Duplicate Employees</title>
+</head>
+<body>
+	<a th:href="@{'/job'}">Add File</a>
+	<br>
+	<button onclick="window.location.href='/duplicates/excel'">Download Excel</button>
+	<br>
+    <h1>Duplicate Employees</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Employee ID</th>
+                <th>Full Name</th>
+                <th>Number</th>
+                <th>Company</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="employee : ${duplicates}">
+                <td th:text="${employee.employeeId}"></td>
+                <td th:text="${employee.fullname}"></td>
+                <td th:text="${employee.number}"></td>
+                <td th:text="${employee.company}"></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

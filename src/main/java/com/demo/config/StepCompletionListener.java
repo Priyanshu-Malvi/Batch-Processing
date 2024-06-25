@@ -24,6 +24,8 @@ public class StepCompletionListener implements StepExecutionListener {
 	
 	private Set<String> processedEmployees;
 	
+	private Long jobId;
+	
 	@Override
 	public void beforeStep(StepExecution stepExecution) {
         // Code to execute before the step starts
@@ -32,6 +34,8 @@ public class StepCompletionListener implements StepExecutionListener {
         processedEmployees = new HashSet<>();
         
         JobModel currentJob = jobRepo.findById(stepExecution.getJobExecutionId()).get();
+        
+        jobId = stepExecution.getJobExecutionId();
         
         StepMaster step = new StepMaster();
         step.setStepId(stepExecution.getId());
@@ -86,5 +90,9 @@ public class StepCompletionListener implements StepExecutionListener {
 	public Set<String> getProcessedEmployees() {
         return processedEmployees;
     }
+	
+	public Long getJobId() {
+		return jobId;
+	}
 	
 }

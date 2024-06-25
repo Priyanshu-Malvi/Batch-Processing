@@ -29,6 +29,9 @@ public class JobModel {
 	@OneToMany(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
 	@JsonManagedReference
     private List<StepMaster> stepList;
+	
+	@OneToMany(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
+    private List<DuplicateEmployeeModel> duplicateEmployees;
 
 	public JobModel() {
 		super();
@@ -48,6 +51,14 @@ public class JobModel {
 		this.jobBatchStatus = jobBatchStatus;
 		this.jobExitStatus = jobExitStatus;
 		this.stepList = stepList;
+	}
+
+	public List<DuplicateEmployeeModel> getDuplicateEmployees() {
+		return duplicateEmployees;
+	}
+
+	public void setDuplicateEmployees(List<DuplicateEmployeeModel> duplicateEmployees) {
+		this.duplicateEmployees = duplicateEmployees;
 	}
 
 	public Long getJobId() {
